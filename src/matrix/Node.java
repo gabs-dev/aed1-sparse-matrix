@@ -64,4 +64,11 @@ public class Node {
         this.column = column;
     }
 
+    @Override
+    public String toString() {
+        return "[" +
+                row + ", " +
+                column + "]\n" +
+                value;
+    }
 }
