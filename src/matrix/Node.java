@@ -24,6 +24,12 @@ public class Node {
         this.column = column;
     }
 
+    public Node(int value, int row, int column) {
+        this.value = value;
+        this.row = row;
+        this.column = column;
+    }
+
     public int getValue() {
         return value;
     }
