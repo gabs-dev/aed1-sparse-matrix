@@ -5,6 +5,7 @@ public class SparseMatrix {
     private Node head;
     private int rows;
     private int columns;
+    private long size = 0;
 
     public SparseMatrix() {
         head = new Node();
@@ -54,113 +55,200 @@ public class SparseMatrix {
     // tenho que rotacionar e inserir borda ainda
     public void insert(int value, int row, int column) {
 
-        if (row >= this.rows || row < 0 || column >= this.columns || column < 0)
+//        if (row >= this.rows || row < 0 || column >= this.columns || column < 0)
+//            throw new ArrayIndexOutOfBoundsException("Posição da matriz inválida");
+//        else {
+//            Node sentinelRow = this.getSentinel(row, -1);
+//            Node sentinelColumn = this.getSentinel(-1, column);
+//            Node node = new Node(value, row, column);
+//            Node aux = null, nodeColumn = null, nodeRow = null;
+//
+//            if (sentinelRow.getRight() == null && sentinelColumn.getDown() == null) {
+//                sentinelRow.setRight(node);
+//                sentinelColumn.setDown(node);
+//            } else if (sentinelRow.getRight() != null && sentinelColumn.getDown() == null) {
+//                aux = sentinelRow;
+//
+//                do {
+//                    if (aux.getColumn() < column && (aux.getRight() != null && aux.getRight().getColumn() > column))
+//                        break;
+//                    nodeRow = aux;
+//                    aux = aux.getRight();
+//                } while (aux != null);
+//
+//                node.setRight(nodeRow.getRight());
+//                nodeRow.setRight(node);
+//                sentinelColumn.setDown(node);
+//            } else if (sentinelRow.getRight() == null && sentinelColumn.getDown() != null) {
+//                aux = sentinelColumn;
+//
+//                do {
+//                    if (aux.getRow() < row && (aux.getDown() != null && aux.getDown().getRow() > row))
+//                        break;
+//                    nodeColumn = aux;
+//                    aux = aux.getDown();
+//                } while (aux != null);
+//
+//                node.setDown(nodeColumn.getDown());
+//                nodeColumn.setDown(node);
+//                sentinelRow.setRight(node);
+//            } else if (sentinelRow.getRight() != null && sentinelColumn.getDown() != null) {
+//                nodeColumn = null;
+//                nodeRow = null;
+//
+//                aux = sentinelRow;
+//                do {
+//                    if (aux.getColumn() < column && (aux.getRight() != null && aux.getRight().getColumn() > column))
+//                        break;
+//                    nodeRow = aux;
+//                    aux = aux.getRight();
+//                } while (aux != null);
+//
+//                aux = sentinelColumn;
+//                do {
+//                    if (aux.getRow() < row && (aux.getDown() != null && aux.getDown().getRow() > row))
+//                        break;
+//                    nodeColumn = aux;
+//                    aux = aux.getDown();
+//                } while (aux != null);
+//
+//                if (nodeRow.getRight() != null)
+//                    node.setRight(nodeRow.getRight());
+//                if (nodeColumn.getDown() != null)
+//                    node.setDown(nodeColumn.getDown());
+//                nodeRow.setRight(node);
+//                nodeColumn.setDown(node);
+//            }
+//
+//        }
+
+        if (row >= this.rows && row < 0 || column >= this.columns && column < 0)
             throw new ArrayIndexOutOfBoundsException("Posição da matriz inválida");
-        else {
-            Node sentinelRow = this.getSentinel(row, -1);
-            Node sentinelColumn = this.getSentinel(-1, column);
-            Node node = new Node(value, row, column);
 
-            if (sentinelRow.getRight() != null || sentinelColumn.getDown() != null) {
-                Node aux = null, nodeRow = null, nodeColumn = null;
-                aux = sentinelRow;
-                do {
-                    if (aux.getColumn() < column && (aux.getRight() != null && aux.getRight().getColumn() > column))
-                        break;
-                    nodeRow = aux;
-                    aux = aux.getRight();
-                } while (aux != null);
+        Node node = new Node(value, row, column);
+        Node aux = null;
 
-                aux = sentinelColumn;
-                do {
-                    if (aux.getRow() < row && (aux.getDown() != null && aux.getDown().getRow() > row))
-                        break;
-                    nodeColumn = aux;
-                    aux = aux.getDown();
-                } while (aux != null);
+        Node sentinelRow = getSentinel(row, -1);
+        Node sentinelColumn = getSentinel(-1, column);
 
-                node.setRight(nodeRow.getRight());
-                node.setDown(nodeColumn.getDown());
-                nodeRow.setRight(node);
-                nodeColumn.setDown(node);
-            } else {
-                if (sentinelRow.getRight() == null)
-                    sentinelRow.setRight(node);
-                if (sentinelColumn.getDown() == null)
-                    sentinelColumn.setDown(node);
-            }
+        if (sentinelRow.getRight() != null && sentinelColumn.getDown() != null) {
+            aux = sentinelRow.getRight();
+            Node previousNode = null;
+            do {
+                previousNode = aux;
+                aux = aux.getRight();
+            } while(aux != null);
+
+            aux = sentinelColumn.getDown();
+            Node nodeAbove = null;
+            do {
+                nodeAbove = aux;
+                aux = aux.getDown();
+            } while(aux != null);
+
+            previousNode.setRight(node);
+            nodeAbove.setDown(node);
         }
 
-//        if (row >= this.rows && row < 0 || column >= this.columns && column < 0)
-//            throw new ArrayIndexOutOfBoundsException("Posição da matriz inválida");
-//
-//        Node node = new Node(value, row, column);
-//        Node aux = null;
-//
-//        Node sentinelRow = getSentinel(row, -1);
-//        Node sentinelColumn = getSentinel(-1, column);
-//
-//        if (sentinelRow.getRight() != null && sentinelColumn.getDown() != null) {
-//            aux = sentinelRow.getRight();
-//            Node previousNode = null;
-//            do {
-//                previousNode = aux;
-//                aux = aux.getRight();
-//            } while(aux != null);
-//
-//            aux = sentinelColumn.getDown();
-//            Node nodeAbove = null;
-//            do {
-//                nodeAbove = aux;
-//                aux = aux.getDown();
-//            } while(aux != null);
-//
-//            previousNode.setRight(node);
-//            nodeAbove.setDown(node);
-//        }
-//
-//        if (sentinelRow.getRight() == null && sentinelColumn.getDown() == null) {
-//            sentinelRow.setRight(node);
-//            sentinelColumn.setDown(node);
-//        }
-//
-//        if (sentinelRow.getRight() != null && sentinelColumn.getDown() == null) {
-//            aux = sentinelRow.getRight();
-//            Node previousNode = null;
-//            do {
-//                previousNode = aux;
-//                aux = aux.getRight();
-//            } while(aux != null);
-//
-//            previousNode.setRight(node);
-//            sentinelColumn.setDown(node);
-//        }
-//
-//        if (sentinelRow.getRight() == null && sentinelColumn.getDown() != null) {
-//            aux = sentinelColumn.getDown();
-//            Node nodeAbove = null;
-//            do {
-//                nodeAbove = aux;
-//                aux = aux.getDown();
-//            } while(aux != null);
-//
-//            sentinelRow.setRight(node);
-//            nodeAbove.setDown(node);
-//        }
+        if (sentinelRow.getRight() == null && sentinelColumn.getDown() == null) {
+            sentinelRow.setRight(node);
+            sentinelColumn.setDown(node);
+        }
+
+        if (sentinelRow.getRight() != null && sentinelColumn.getDown() == null) {
+            aux = sentinelRow.getRight();
+            Node previousNode = null;
+            do {
+                previousNode = aux;
+                aux = aux.getRight();
+            } while(aux != null);
+
+            previousNode.setRight(node);
+            sentinelColumn.setDown(node);
+        }
+
+        if (sentinelRow.getRight() == null && sentinelColumn.getDown() != null) {
+            aux = sentinelColumn.getDown();
+            Node nodeAbove = null;
+            do {
+                nodeAbove = aux;
+                aux = aux.getDown();
+            } while(aux != null);
+
+            sentinelRow.setRight(node);
+            nodeAbove.setDown(node);
+        }
+
+        this.size++;
+    }
+
+    public int delete(int row, int column) {
+        Node sentinelRow = this.getSentinel(row, -1), sentinelColumn = this.getSentinel(-1, column),
+                nodeRow = null, nodeColumn = null;
+        if (sentinelRow.getRight() != null && sentinelColumn.getDown() != null) {
+            do {
+                nodeRow = sentinelRow;
+                sentinelRow = sentinelRow.getRight();
+                if (sentinelRow!= null && sentinelRow.getColumn() == column)
+                    break;
+            } while (sentinelRow != null);
+            do {
+                nodeColumn = sentinelColumn;
+                sentinelColumn = sentinelColumn.getRight();
+                if (sentinelColumn != null && sentinelColumn.getRow() == row)
+                    break;
+            } while(sentinelColumn != null);
+
+            if (sentinelRow != null)
+                nodeRow.setRight(sentinelRow.getRight());
+            if (sentinelColumn != null)
+                nodeColumn.setDown(sentinelColumn.getDown());
+
+            this.size--;
+            return sentinelRow.getValue();
+        }
+
+        return 0;
     }
 
     public void reverseColors(int maxValue) {
+        if (maxValue < 0)
+            throw new IllegalArgumentException("O valor maimo é inválido");
+        if (isEmpty())
+            throw new NullPointerException("A matriz está vazia");
+
         for (int i = 0; i < this.rows; i++) {
             for (int j = 0; j < this.columns; j++) {
                 Node node = getNodeAt(i, j);
-                if (node == null) {
+                if (node == null)
                     this.insert(maxValue, i, j);
-                } else {
+                else if (node.getValue() == maxValue)
+                    this.delete(i, j);
+                else {
                     int value = maxValue - node.getValue();
                     node.setValue(value);
                 }
             }
         }
+    }
+
+    public SparseMatrix rotateClockwise() {
+        SparseMatrix rotated = new SparseMatrix(this.getColumns(), this.getRows());
+        int c;
+        for (int i = 0; i < rotated.rows; i++) {
+            c = rotated.columns;
+            for (int j = 0; j < rotated.columns; j++) {
+                c--;
+                int value = getValueAt(c, i);
+                if (value != -1)
+                    rotated.insert(value, i, j);
+            }
+        }
+        return rotated;
+    }
+
+    public void insertBorders(int width, int value) {
+        this.borders(value, width, (this.rows - 1), 0, 0, (this.columns - 1));
     }
 
     /** Método para retorno de uma sentinela na posição (linha, coluna) passados por parâmetro.
@@ -190,19 +278,31 @@ public class SparseMatrix {
     }
 
     private Node getNodeAt(int row, int column) {
-        Node nodeRow = head.getDown();
-        Node node = null;
+        if (isEmpty())
+            throw new NullPointerException("A matriz está vazia");
 
+        Node nodeRow = head.getDown(), node = null;
+                //this.getSentinel(row, -1), node = null;
         do {
             node = nodeRow.getRight();
             do {
-                if (node.getRow() == row && node.getColumn() == column) {
+                if (node.getRow() == row && node.getColumn() == column)
                     return node;
-                }
                 node = node.getRight();
-            } while (node != null);
+            } while(node != null);
             nodeRow = nodeRow.getDown();
-        } while (nodeRow != null);
+        } while(nodeRow != null);
+
+//        do {
+//            do {
+//                if (node.getRow() == row && node.getColumn() == column) {
+//                    return node;
+//                }
+//                node = node.getRight();
+//            } while (node != null);
+//            nodeRow = nodeRow.getDown();
+//            node = nodeRow;
+//        } while (nodeRow != null);
 
         return null;
     }
@@ -231,6 +331,35 @@ public class SparseMatrix {
             aux.getDown().setColumn(-1);
             aux = aux.getDown(); // pega a celula abaixo da ultima celula criada
         }
+    }
+
+    private void borders(int value, int width, int bottomEdge, int topEdge, int leftEdge, int rightEdge) {
+        if (topEdge < width) {
+            for (int i = leftEdge; i <= rightEdge; i++) {
+                this.insert(value, topEdge, i);
+                this.insert(value, bottomEdge, i);
+            }
+            for (int i = (topEdge + 1); i < bottomEdge; i++) {
+                this.insert(value, i, leftEdge);
+                this.insert(value, i, rightEdge);
+            }
+            this.borders(value, width, (bottomEdge - 1), (topEdge + 1), (leftEdge + 1), (rightEdge - 1));
+        }
+    }
+
+    public int getValueAt(int row, int column) {
+        if (this.getNodeAt(row, column) == null)
+            return -1;
+        else
+            return this.getNodeAt(row, column).getValue();
+    }
+
+    private boolean isEmpty() {
+        return (this.size == 0);
+    }
+
+    public long size() {
+        return this.size;
     }
 
     @Override
