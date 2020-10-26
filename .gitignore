@@ -26,3 +26,4 @@ hs_err_pid*
 .idea
 out
 src/controller/Test.java
+nova-imagem*.pgm

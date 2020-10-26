@@ -47,173 +47,93 @@ public class SparseMatrix {
         this.columns = columns;
     }
 
-    public Node getNodeByIndex(int row, int column) {
-        return null;
-    }
-
-    // essa função eu tenho arrumar, mas o resto eu acho que ta funcionando de boa
-    // tenho que rotacionar e inserir borda ainda
+    /**
+     * Método que insere uma nova célula na matriz.
+     * Percorre as linhas e a colunas até encontrar a posição onde a nova célula deve ser inserida.
+     * @param value Valor que será inserido na célula
+     * @param row Linha onde a célula será inserida
+     * @param column Coluna onde a célula será inserida
+     */
     public void insert(int value, int row, int column) {
 
-//        if (row >= this.rows || row < 0 || column >= this.columns || column < 0)
-//            throw new ArrayIndexOutOfBoundsException("Posição da matriz inválida");
-//        else {
-//            Node sentinelRow = this.getSentinel(row, -1);
-//            Node sentinelColumn = this.getSentinel(-1, column);
-//            Node node = new Node(value, row, column);
-//            Node aux = null, nodeColumn = null, nodeRow = null;
-//
-//            if (sentinelRow.getRight() == null && sentinelColumn.getDown() == null) {
-//                sentinelRow.setRight(node);
-//                sentinelColumn.setDown(node);
-//            } else if (sentinelRow.getRight() != null && sentinelColumn.getDown() == null) {
-//                aux = sentinelRow;
-//
-//                do {
-//                    if (aux.getColumn() < column && (aux.getRight() != null && aux.getRight().getColumn() > column))
-//                        break;
-//                    nodeRow = aux;
-//                    aux = aux.getRight();
-//                } while (aux != null);
-//
-//                node.setRight(nodeRow.getRight());
-//                nodeRow.setRight(node);
-//                sentinelColumn.setDown(node);
-//            } else if (sentinelRow.getRight() == null && sentinelColumn.getDown() != null) {
-//                aux = sentinelColumn;
-//
-//                do {
-//                    if (aux.getRow() < row && (aux.getDown() != null && aux.getDown().getRow() > row))
-//                        break;
-//                    nodeColumn = aux;
-//                    aux = aux.getDown();
-//                } while (aux != null);
-//
-//                node.setDown(nodeColumn.getDown());
-//                nodeColumn.setDown(node);
-//                sentinelRow.setRight(node);
-//            } else if (sentinelRow.getRight() != null && sentinelColumn.getDown() != null) {
-//                nodeColumn = null;
-//                nodeRow = null;
-//
-//                aux = sentinelRow;
-//                do {
-//                    if (aux.getColumn() < column && (aux.getRight() != null && aux.getRight().getColumn() > column))
-//                        break;
-//                    nodeRow = aux;
-//                    aux = aux.getRight();
-//                } while (aux != null);
-//
-//                aux = sentinelColumn;
-//                do {
-//                    if (aux.getRow() < row && (aux.getDown() != null && aux.getDown().getRow() > row))
-//                        break;
-//                    nodeColumn = aux;
-//                    aux = aux.getDown();
-//                } while (aux != null);
-//
-//                if (nodeRow.getRight() != null)
-//                    node.setRight(nodeRow.getRight());
-//                if (nodeColumn.getDown() != null)
-//                    node.setDown(nodeColumn.getDown());
-//                nodeRow.setRight(node);
-//                nodeColumn.setDown(node);
-//            }
-//
-//        }
+        if (row >= this.rows || row < 0 || column >= this.columns || column < 0)
+            throw new ArrayIndexOutOfBoundsException("A posição da matriz é inválida");
 
-        if (row >= this.rows && row < 0 || column >= this.columns && column < 0)
-            throw new ArrayIndexOutOfBoundsException("Posição da matriz inválida");
+        Node node = new Node(value, row, column), nodeRow = getSentinel(row, -1),
+                nodeColumn = getSentinel(-1, column), auxRow = null, auxColumn = null;
 
-        Node node = new Node(value, row, column);
-        Node aux = null;
-
-        Node sentinelRow = getSentinel(row, -1);
-        Node sentinelColumn = getSentinel(-1, column);
-
-        if (sentinelRow.getRight() != null && sentinelColumn.getDown() != null) {
-            aux = sentinelRow.getRight();
-            Node previousNode = null;
-            do {
-                previousNode = aux;
-                aux = aux.getRight();
-            } while(aux != null);
-
-            aux = sentinelColumn.getDown();
-            Node nodeAbove = null;
-            do {
-                nodeAbove = aux;
-                aux = aux.getDown();
-            } while(aux != null);
-
-            previousNode.setRight(node);
-            nodeAbove.setDown(node);
+        while (nodeRow != null && nodeRow.getColumn() != node.getColumn()) {
+            auxRow = nodeRow;
+            nodeRow = nodeRow.getRight();
         }
 
-        if (sentinelRow.getRight() == null && sentinelColumn.getDown() == null) {
-            sentinelRow.setRight(node);
-            sentinelColumn.setDown(node);
+        while (nodeColumn != null && nodeColumn.getRow() != node.getRow()) {
+            auxColumn = nodeColumn;
+            nodeColumn = nodeColumn.getDown();
         }
 
-        if (sentinelRow.getRight() != null && sentinelColumn.getDown() == null) {
-            aux = sentinelRow.getRight();
-            Node previousNode = null;
-            do {
-                previousNode = aux;
-                aux = aux.getRight();
-            } while(aux != null);
-
-            previousNode.setRight(node);
-            sentinelColumn.setDown(node);
-        }
-
-        if (sentinelRow.getRight() == null && sentinelColumn.getDown() != null) {
-            aux = sentinelColumn.getDown();
-            Node nodeAbove = null;
-            do {
-                nodeAbove = aux;
-                aux = aux.getDown();
-            } while(aux != null);
-
-            sentinelRow.setRight(node);
-            nodeAbove.setDown(node);
+        if (nodeRow == null || nodeColumn == null) {
+            auxRow.setRight(node);
+            auxColumn.setDown(node);
+        } else {
+            auxRow.setRight(node);
+            node.setRight(nodeRow.getRight());
+            auxColumn.setDown(node);
+            node.setDown(nodeColumn.getDown());
         }
 
         this.size++;
     }
 
-    public int delete(int row, int column) {
-        Node sentinelRow = this.getSentinel(row, -1), sentinelColumn = this.getSentinel(-1, column),
-                nodeRow = null, nodeColumn = null;
-        if (sentinelRow.getRight() != null && sentinelColumn.getDown() != null) {
-            do {
-                nodeRow = sentinelRow;
-                sentinelRow = sentinelRow.getRight();
-                if (sentinelRow!= null && sentinelRow.getColumn() == column)
-                    break;
-            } while (sentinelRow != null);
-            do {
-                nodeColumn = sentinelColumn;
-                sentinelColumn = sentinelColumn.getRight();
-                if (sentinelColumn != null && sentinelColumn.getRow() == row)
-                    break;
-            } while(sentinelColumn != null);
+    /**
+     * Método que remove, se existir, uma célula na posição [linha, coluna] da matriz
+     * @param row Linha onde está a célula que será excluída
+     * @param column Coluna onde está a célula que será excluída
+     */
+    public void delete(int row, int column) {
 
-            if (sentinelRow != null)
-                nodeRow.setRight(sentinelRow.getRight());
-            if (sentinelColumn != null)
-                nodeColumn.setDown(sentinelColumn.getDown());
-
-            this.size--;
-            return sentinelRow.getValue();
+        if (row >= rows || column >= columns) {
+            throw new ArrayIndexOutOfBoundsException("Erro ao excluir elemento.");
+        }
+        if (isEmpty()) {
+            throw new NullPointerException("Matriz vazia.");
+        }
+        if (getNodeAt(row, column) == null) {
+            throw new NullPointerException("Elemento nulo.");
         }
 
-        return 0;
+        Node nodeRow = getSentinel(row, -1);
+        Node previousRow = nodeRow;
+        nodeRow = nodeRow.getRight();
+        Node nodeColumn = getSentinel(-1, column);
+        Node previousColumn = nodeColumn;
+        nodeColumn = nodeColumn.getDown();
+        while (nodeRow != null && nodeRow.getColumn() != column) {
+            previousRow = nodeRow;
+            nodeRow = nodeRow.getRight();
+        }
+
+        while (nodeColumn != null && nodeColumn.getRow() != row) {
+            previousColumn = nodeColumn;
+            nodeColumn = nodeColumn.getDown();
+        }
+
+        if (nodeRow == null || nodeColumn == null) {
+            throw new IllegalArgumentException("Node nao encontrado.");
+        }
+        previousRow.setRight(nodeRow.getRight());
+        previousColumn.setDown(nodeColumn.getDown());
+        this.size--;
+
     }
 
+    /**
+     * Método que percorre todos os elementos da matriz e inverte os valores. A inversão é feita subtraindo do valor
+     * maáximo o valor atual da célula.
+     * @author Gabriel Felipe
+     * @param maxValue Maior valor inserido na matriz
+     */
     public void reverseColors(int maxValue) {
-        if (maxValue < 0)
-            throw new IllegalArgumentException("O valor maimo é inválido");
         if (isEmpty())
             throw new NullPointerException("A matriz está vazia");
 
@@ -232,7 +152,15 @@ public class SparseMatrix {
         }
     }
 
+    /**
+     * Método que rotaciona a matriz atual 90° no sentido horário
+     * @author Gabriel Felipe
+     * @return Matriz esparsa rotacionada
+     */
     public SparseMatrix rotateClockwise() {
+        if (isEmpty()) {
+            throw new NullPointerException("A matriz está vazia!");
+        }
         SparseMatrix rotated = new SparseMatrix(this.getColumns(), this.getRows());
         int c;
         for (int i = 0; i < rotated.rows; i++) {
@@ -247,11 +175,22 @@ public class SparseMatrix {
         return rotated;
     }
 
+    /**
+     * Método recebe a largura e o valor da borda.
+     * Chama outro método passando os valores necessários por parâmetro para que as bordas sejam inseridas.
+     * @param width Largura da borda que será inseirda
+     * @param value Valor a ser inserido nas bordas
+     */
     public void insertBorders(int width, int value) {
+        if (width < 0 || width >= (columns / 2) || width >= (rows / 2))
+            throw new IllegalArgumentException("Tamanho de borda inválido");
+        if (isEmpty())
+            throw new NullPointerException("A matriz está vazia");
         this.borders(value, width, (this.rows - 1), 0, 0, (this.columns - 1));
     }
 
-    /** Método para retorno de uma sentinela na posição (linha, coluna) passados por parâmetro.
+    /**
+     * Método para retorno de uma sentinela na posição (linha, coluna) passados por parâmetro.
      * @author Gabriel Felipe
      * @param row int - Linha da sentinela
      * @param column int - Coluna da sentinela
@@ -277,62 +216,57 @@ public class SparseMatrix {
         throw new IllegalArgumentException("Nenhuma sentinela foi encontrada na posição: [" + row + ", " + column + "]");
     }
 
+    /**
+     * Método que retorna a célula localizada na posição [linha, coluna] da matriz
+     * @param row Linha onde a célula se encontra
+     * @param column Coluna onde a célula se encontra
+     * @return A célula na posição [linha, coluna]
+     */
     private Node getNodeAt(int row, int column) {
         if (isEmpty())
             throw new NullPointerException("A matriz está vazia");
 
-        Node nodeRow = head.getDown(), node = null;
-                //this.getSentinel(row, -1), node = null;
-        do {
-            node = nodeRow.getRight();
-            do {
-                if (node.getRow() == row && node.getColumn() == column)
-                    return node;
-                node = node.getRight();
-            } while(node != null);
-            nodeRow = nodeRow.getDown();
-        } while(nodeRow != null);
+        Node node = this.head;
+        while (node != null && node.getRow() != row)
+            node = node.getDown();
 
-//        do {
-//            do {
-//                if (node.getRow() == row && node.getColumn() == column) {
-//                    return node;
-//                }
-//                node = node.getRight();
-//            } while (node != null);
-//            nodeRow = nodeRow.getDown();
-//            node = nodeRow;
-//        } while (nodeRow != null);
+        if (node != null) {
+            while (node != null && node.getColumn() != column)
+                node = node.getRight();
+            return node;
+        }
 
         return null;
     }
 
+    /**
+     * Método que cria todas as sentinelas de linha e colula da matriz utilizando a célula cabeça.
+     */
     private void createSentinels() {
         // cria as sentinelas das colunas
-        Node aux = new Node(); // cria um nova celula
-        aux.setColumn(0);
-        head.setRight(aux); // adiciona a celula no valor a direita da cabeça
-        aux = head.getRight();
-        for (int i = 1; i < columns; i++) {
-            aux.setRight(new Node()); // cria uma nova celula a direita da ultima celula criadaa
-            aux.getRight().setColumn(i);
-            aux.getRight().setRow(-1);
-            aux = aux.getRight(); // pega a celula a direita da ultima celula criada
+        Node aux = head;
+        for (int i = 0; i < columns; i++) {
+            aux.setRight(new Node(-1, i));
+            aux = aux.getRight(); // pega a sentinela a direita da ultima celula criada
         }
 
         // cria as sentinelas das linhas
-        aux = new Node();
-        aux.setRow(0);
-        head.setDown(aux); // adiciona a celula no valor abaixo da cabeça
-        aux = head.getDown();
-        for (int i = 1; i < rows; i++) {
-            aux.setDown(new Node()); // cria uma nova celula abaixo da ultima celula criada
-            aux.getDown().setRow(i);
-            aux.getDown().setColumn(-1);
-            aux = aux.getDown(); // pega a celula abaixo da ultima celula criada
+        aux = head;
+        for (int i = 0; i < rows; i++) {
+            aux.setDown(new Node(i, -1)); // cria uma nova sentinela abaixo da ultima celula criada
+            aux = aux.getDown(); // pega a sentinela abaixo da ultima celula criada
         }
     }
 
+    /**
+     * Método que chama a si mesmo e vai inserindo a borda pixel por pixel até que o tamanho da borda seja atingido
+     * @param value Valor que será inserido nas bordas
+     * @param width Tamanho da borda
+     * @param bottomEdge Linha onde a borda inferior será inserida
+     * @param topEdge Linha onde a borda superior será inserida
+     * @param leftEdge Coluna onde a borda esquerda será inserida
+     * @param rightEdge Coluna onde a borda direita será inserida
+     */
     private void borders(int value, int width, int bottomEdge, int topEdge, int leftEdge, int rightEdge) {
         if (topEdge < width) {
             for (int i = leftEdge; i <= rightEdge; i++) {
@@ -347,6 +281,13 @@ public class SparseMatrix {
         }
     }
 
+    /**
+     * Método retorna o valor da celula na posição [linha, coluna] da matriz.
+     * Caso a célula não exista, retorna -1
+     * @param row Linha em que se encontra a célula
+     * @param column Coluna em que se encontra a célula
+     * @return int - Valor da célula na posição [linha, coluna]
+     */
     public int getValueAt(int row, int column) {
         if (this.getNodeAt(row, column) == null)
             return -1;
@@ -354,12 +295,45 @@ public class SparseMatrix {
             return this.getNodeAt(row, column).getValue();
     }
 
+    /**
+     * Método verifica se a matriz está vazia.
+     * @return boolean - true se a matriz estiver vazia, caso contrário false.
+     */
     private boolean isEmpty() {
         return (this.size == 0);
     }
 
+    /**
+     * Método que retorna o tamanho da matriz com base na quatidade de células inseridas
+     * @return long - Tamanho da matriz
+     */
     public long size() {
         return this.size;
+    }
+
+    /**
+     * Método que retorna uma String para criar um arquivo pgm da matriz atual
+     * @param maxValue Maior valor inserido na matriz
+     * @return String com as informações necessárias para criar um arquivo pgm
+     */
+    public String generatePgmString(int maxValue) {
+        StringBuilder pgm = new StringBuilder();
+        pgm.delete(0, pgm.length());
+        pgm.append("P2\n");
+        pgm.append(this.columns).append(" ").append(this.rows).append("\n");
+        pgm.append(maxValue).append("\n");
+        for (int i = 0; i < this.rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                Node node = this.getNodeAt(i, j);
+                if (node == null)
+                    pgm.append("0");
+                else
+                    pgm.append(node.getValue());
+                pgm.append(" ");
+            }
+            pgm.append("\n");
+        }
+        return pgm.toString();
     }
 
     @Override
@@ -370,7 +344,7 @@ public class SparseMatrix {
             for (int j = 0; j < this.columns; j++) {
                 Node aux = this.getNodeAt(i, j);
                 if (aux == null)
-                    sb.append("-");
+                    sb.append("0");
                 else if (aux != null)
                     sb.append(aux.getValue());
                 sb.append("\t");
